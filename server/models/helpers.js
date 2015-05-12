@@ -143,9 +143,15 @@ module.exports.helpRequest = function(username, project, response) {
 };
 
 module.exports.projectUpvote = function(userId, projectId, response) {
-  ProjectUpvote.create({upvoter: userId, projectupvoted: projectId}).then(function() {
-      response.send(201, "Project upvoted");
-    })
+  ProjectUpvote.find({where: {upvoter: userId, projectupvoted: projectId}}).then(function(projectUpvoted) {
+    if (projectUpvoted) {
+        response.send(201, "You voted already");
+      } else {
+        ProjectUpvote.create({upvoter: userId, projectupvoted: projectId}).then(function() {
+            response.send(201, "Project upvoted");
+        })
+      }
+  });
 };
 
 module.exports.viewProject = function(projectId, response) {
@@ -217,9 +223,15 @@ module.exports.contributionComment = function(contribution, response) {
 };
 
 module.exports.contributionUpvote = function(userId, contributionId, response) {
+  ContributionUpvote.find({where: {upvoter: userId, contributionupvoted: contributionId}}).then(function(contributionUpvoted) {
+    if (contributionUpvoted) {
+      response.send(201, "You voted already");
+    } else {
   ContributionUpvote.create({upvoter: userId, contributionupvoted: contributionId}).then(function() {
       response.send(201, "Contribution upvoted");
     })
+    }
+  })
 };
 
 module.exports.viewContribution = function(contributionId, decoded, response) {
